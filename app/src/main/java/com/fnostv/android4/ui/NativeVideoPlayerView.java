@@ -66,9 +66,7 @@ public final class NativeVideoPlayerView {
     private static final int LARGE_SEEK_STEP_MS = 30000;
     private static final int CONTROL_HIDE_DELAY_MS = 5000;
     private static final int PROGRESS_INTERVAL_MS = 1000;
-    private static final int PREPARE_TIMEOUT_MS = 30000;
     /** 系统播放器（MediaPlayer）超过这个时间还没出画面就换回 VLC。 */
-    private static final int SYSTEM_FIRST_FRAME_TIMEOUT_MS = 25000;
     /** 直播流掉线后的自动重连次数。 */
     private static final int LIVE_MAX_RETRIES = 4;
     private static final int SEEK_COMMIT_DELAY_MS = 260;
@@ -458,12 +456,6 @@ public final class NativeVideoPlayerView {
             if (hintView != null) {
                 hintView.setVisibility(View.GONE);
             }
-        }
-    };
-    private final Runnable prepareTimeoutRunnable = new Runnable() {
-        @Override
-        public void run() {
-            // 已关闭：不再按秒数判定超时（慢流/老机器起播慢时会被误杀）
         }
     };
     /** 播够 90 秒没出事，就把「最后播放」标记清掉（避免下次误判）。 */
@@ -1050,8 +1042,6 @@ public final class NativeVideoPlayerView {
         }
         handler.removeCallbacks(progressRunnable);
         handler.post(progressRunnable);
-        handler.removeCallbacks(prepareTimeoutRunnable);
-        handler.postDelayed(prepareTimeoutRunnable, PREPARE_TIMEOUT_MS);
         updateControlText();
         showControlsTemporarily();
     }
@@ -1419,7 +1409,6 @@ public final class NativeVideoPlayerView {
             player.setListener(new PlayerEngine.Listener() {
                 @Override
                 public void onPrepared(int width, int height, int durationMs) {
-                    handler.removeCallbacks(prepareTimeoutRunnable);
                     prepared = true;
                     videoWidth = width;
                     videoHeight = height;
@@ -1550,7 +1539,6 @@ public final class NativeVideoPlayerView {
             prepareStartedAtMs = System.currentTimeMillis();
             showHint("正在启动 " + player.name() + " · " + playbackStatusLabel());
             updateControlText();
-            guardSystemFirstFrame(player);
             try {
                 player.prepare(prepareUrlFor(player), playbackOptions);
             } catch (Throwable ex) {
@@ -1617,33 +1605,6 @@ public final class NativeVideoPlayerView {
         restartPlayback(reason);
     }
 
-    /**
-     * 系统播放器保底：只在「已经 prepared 但 25 秒都看不到首帧」时换回 VLC。
-     * 注意不能太激进——视频层还占着时立刻起第二个解码器，MTK 电视可能会整机重启。
-     */
-    private void guardSystemFirstFrame(final PlayerEngine engine) {
-        // 已关闭：不再按秒数自动切回 VLC，只在真正解码报错时回退
-        if (true) {
-            return;
-        }
-        if (!(engine instanceof SystemPlayerEngine)) {
-            return;
-        }
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isVisible() || currentPlayer != engine || firstFrameSeen || suppressErrors) {
-                    return;
-                }
-                if (!prepared) {
-                    return;
-                }
-                forceVlc = true;
-                restartPlayback("系统播放器无画面，改用 VLC");
-            }
-        }, SYSTEM_FIRST_FRAME_TIMEOUT_MS);
-    }
-
     private void retryWithFluentPlayback(String reason) {
         playbackOptions = PlaybackStrategy.onFrequentBuffering(playbackOptions);
         bufferingCount = 0;
@@ -1671,8 +1632,6 @@ public final class NativeVideoPlayerView {
                 startPlayer();
             }
         }
-        handler.removeCallbacks(prepareTimeoutRunnable);
-        handler.postDelayed(prepareTimeoutRunnable, PREPARE_TIMEOUT_MS);
     }
 
     private final Runnable deferredStartRunnable = new Runnable() {
@@ -1702,7 +1661,6 @@ public final class NativeVideoPlayerView {
     }
 
     private void notifyPlaybackError(String reason) {
-        handler.removeCallbacks(prepareTimeoutRunnable);
         Logger.w(engineName() + " playback error file=" + fileName() + " format=" + formatLabel()
                 + " hw=" + preferHardwareCodec
                 + " options=" + optionsLabel()
@@ -1995,7 +1953,6 @@ public final class NativeVideoPlayerView {
         }
         handler.removeCallbacks(progressRunnable);
         handler.removeCallbacks(hideControlsRunnable);
-        handler.removeCallbacks(prepareTimeoutRunnable);
         handler.removeCallbacks(seekCommitRunnable);
         handler.removeCallbacks(seekSettledRunnable);
         suppressErrors = true;
@@ -2122,8 +2079,6 @@ public final class NativeVideoPlayerView {
         if (surfaceReady) {
             startPlayer();
         }
-        handler.removeCallbacks(prepareTimeoutRunnable);
-        handler.postDelayed(prepareTimeoutRunnable, PREPARE_TIMEOUT_MS);
         updateControlText();
     }
 
@@ -2829,8 +2784,6 @@ public final class NativeVideoPlayerView {
         if (surfaceReady) {
             startPlayer();
         }
-        handler.removeCallbacks(prepareTimeoutRunnable);
-        handler.postDelayed(prepareTimeoutRunnable, PREPARE_TIMEOUT_MS);
         updateControlText();
         showControlsTemporarily();
     }
