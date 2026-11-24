@@ -27,6 +27,8 @@
 | --- | --- |
 | ![播放器](docs/screenshots/player.png) | ![播放信息](docs/screenshots/player-info.png) |
 
+> 上面四张是早期版本界面截图，仅用于了解整体布局；本版新增的侧栏折叠、媒体库横幅海报、右侧竖排选集面板以实机为准。
+
 - 首页：媒体库、继续观看、各分区横向卡片，全部来自服务端
 - 剧集页：对齐网页 `/v/tv/season/:guid`，季海报 + 简介 + 评分/清晰度角标 + 集数方格
 - 播放器：底部工具栏（播放类型 / 倍速 / 画面 / 清晰度），上键可用遥控器聚焦
@@ -47,6 +49,16 @@
 - 稳定性：电视刚重启过会自动进入「安全模式」（改用 VLC 解码），避免同一片源反复把电视拖崩
 - 设置：播放偏好（自动连播、硬件解码优先）、外观（深色/浅色/日升日落 + 卡片角标）、关于
 - 遥控器：暂停/快进快退/倍速/画面模式/清晰度/数字键跳转；上键聚焦工具栏，长按确认看播放信息
+
+## 下载
+
+- **[`fnOSTV-1.0.5-TextureView.apk`](https://github.com/xiao0qi/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk)** — 成品包，覆盖安装即可（保留登录态）
+- **[`源代码 (zip)`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip)** — 解压可直接继续开发
+- **[`源代码 (tar.gz)`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.tar.gz)** — 与 zip 内容相同，二选一
+
+也可以直接进 [发行版页面](https://github.com/xiao0qi/fnOSTV/releases/latest) 下载。
+
+文件命名规则：产物文件名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
 
 ## 编译与安装
 
@@ -74,7 +86,7 @@ adb logcat | grep -i fnostv
 
 出签名包：
 
-先按下面「签名文件说明」准备好证书与 `keystore.properties`，再：
+先按下面「签名与出包」准备好证书与 `keystore.properties`，再：
 
 ```bash
 gradle assembleRelease --no-daemon
@@ -85,17 +97,7 @@ gradle assembleRelease --no-daemon
 
 Windows 下 `scripts/` 里有等价的 .cmd / .ps1 脚本，按需选用。
 
-### 下载
-
-- **[`fnOSTV-1.0.5-TextureView.apk`](https://github.com/xiao0qi/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk)** — 成品包，覆盖安装即可（保留登录态）
-- **[`源代码 (zip)`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip)** — 解压可直接继续开发
-- **[`源代码 (tar.gz)`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.tar.gz)** — 与 zip 内容相同，二选一
-
-也可以直接进 [发行版页面](https://github.com/xiao0qi/fnOSTV/releases/latest) 下载。
-
-文件命名规则：产物文件名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
-
-### 签名文件说明
+## 签名与出包
 
 源码包里**不含**签名相关文件——`signing/`、`keystore.properties`、`local.properties` 都在 `.gitignore` 里，不会被打包。所以解压后不能直接出签名包，需要自己补上：
 
@@ -113,7 +115,7 @@ keytool -genkeypair -keystore signing/debug.keystore -storepass android \
 
 注意 debug 和 release 签名不同：**已装 release 版想覆盖升级，必须用同一份 release 证书**，否则要先卸载。
 
-### 本版新增内容（相对 XG-China/fnOSTV）
+## 本版新增内容（相对 XG-China/fnOSTV）
 
 - **界面**：侧栏折叠（260dp ↔ 64dp）、媒体库横幅海报布局 + 文件夹角标、卡片标题；选集面板右侧竖排、当前集蓝框
 - **手势**：单击切控制条、双击暂停、左右滑 seek、长按 1.5x/2x 加速、左半屏竖滑亮度、右半屏竖滑音量、最右 0.5cm 静默区
@@ -153,7 +155,7 @@ app/src/main/java/com/fnostv/android4
 ## 已知限制
 
 - 仅打包 `armeabi-v7a`；如需在 arm64 设备上运行请自行加回 ABI（会显著增大体积）。
-- 4K HEVC 的 **MP4** 直连会让 MTK 固件重启，已自动改为 1080P 转码；MKV 封装的 4K HEVC 可原画直连。
+- 4K HEVC 的 **MP4** 直连会让 MTK 芯片的电视固件重启，已自动改为 1080P 转码；MKV 封装的 4K HEVC 可原画直连（仅限原生 4K 电视，平板不支持 4K）。
 - 4K H.264 转码流在 4.4 上软解跟不上，因此转码分辨率固定 1080P。
 - 收藏以本地为主，并与服务端收藏合并展示；服务端收藏的增删目前在网页端完成。
 - 服务器管理类功能（媒体库管理、任务计划、用户管理）不在 TV 端提供。
