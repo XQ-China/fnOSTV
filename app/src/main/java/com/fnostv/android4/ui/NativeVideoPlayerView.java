@@ -109,6 +109,8 @@ public final class NativeVideoPlayerView {
     private String currentUrl = "";
     /** 转码 HLS 的 http m3u8 地址（token 在 URL 里），非空时把 HLS 交给系统播放器硬解。 */
     private String hlsHttpUrl = "";
+    /** 本片内「转码流失效 → 重新拉列表」的次数，防止死循环。 */
+    private int transcodeRefreshTimes;
 
     public void setHlsHttpUrl(String url) {
         hlsHttpUrl = url == null ? "" : url;
@@ -978,6 +980,7 @@ public final class NativeVideoPlayerView {
         restartSeekTargetMs = -1;
         restartSeekRetries = 0;
         restartRetries = 0;
+        transcodeRefreshTimes = 0;
         currentEntry = entry;
         playbackSources.clear();
         if (sources != null) {
@@ -1662,6 +1665,14 @@ public final class NativeVideoPlayerView {
             retryWithSoftwareCodec("播放失败，正在重试");
             return;
         }
+        // 服务器转码流（后台回来时旧会话/旧列表常已失效）：重新拉一次列表，接着原进度播
+        if (transcodedPlayback && transcodeRefreshTimes < 3 && listener != null && currentEntry != null) {
+            transcodeRefreshTimes++;
+            int resumeMs = Math.max(1, Math.max(position(), lastPositionMs));
+            showHint("正在重新连接转码流…");
+            listener.onTranscodeSeekRequested(currentEntry, resumeMs);
+            return;
+        }
         // 直播流经常会掉线：自动重连几次，而不是直接退出播放器
         if (currentEntry != null && currentEntry.isLive() && liveRetries < LIVE_MAX_RETRIES) {
             liveRetries++;
@@ -2037,6 +2048,11 @@ public final class NativeVideoPlayerView {
     }
 
     public void restartTranscoded(String url, String label, int seekToMs, boolean clamped) {
+        restartTranscoded(url, label, seekToMs, clamped, hlsHttpUrl);
+    }
+
+    public void restartTranscoded(String url, String label, int seekToMs, boolean clamped, String httpUrl) {
+        hlsHttpUrl = httpUrl == null ? "" : httpUrl;
         restartClamped = clamped;
         if (url == null || url.length() == 0) {
             onTranscodeSeekFailed();

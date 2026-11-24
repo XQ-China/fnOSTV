@@ -1281,10 +1281,13 @@ public final class FnosRestClient {
     public static final class PlaylistRefresh {
         public final String url;
         public final int headMs;
+        /** 刷新后能直接 http 拉取的列表地址（空＝只能走本地改写列表）。 */
+        public final String httpUrl;
 
-        PlaylistRefresh(String url, int headMs) {
+        PlaylistRefresh(String url, int headMs, String httpUrl) {
             this.url = url == null ? "" : url;
             this.headMs = Math.max(0, headMs);
+            this.httpUrl = httpUrl == null ? "" : httpUrl;
         }
     }
 
@@ -1317,23 +1320,24 @@ public final class FnosRestClient {
      */
     public PlaylistRefresh refreshTranscodePlaylist(TranscodeSession session) {
         if (session == null || session.playLink.length() == 0) {
-            return new PlaylistRefresh("", 0);
+            return new PlaylistRefresh("", 0, "");
         }
         try {
             String playlistUrl = session.playLink.startsWith("http")
                     ? session.playLink : profile.baseUrl + session.playLink;
             String playlist = fetchText(playlistUrl);
             if (playlist.length() == 0) {
-                return new PlaylistRefresh("", 0);
+                return new PlaylistRefresh("", 0, "");
             }
             String local = writeLocalPlaylist(session.mediaGuid, playlistUrl, playlist);
-            return new PlaylistRefresh(local, playlistDurationMs(playlist));
+            session.httpUrl = probeHttpPlaylist(playlistUrl);
+            return new PlaylistRefresh(local, playlistDurationMs(playlist), session.httpUrl);
         } catch (FnosRpcException ex) {
             Logger.w("HLS playlist refresh failed: " + ex.getMessage());
-            return new PlaylistRefresh("", 0);
+            return new PlaylistRefresh("", 0, "");
         } catch (RuntimeException ex) {
             Logger.w("HLS playlist refresh crashed: " + ex.getMessage());
-            return new PlaylistRefresh("", 0);
+            return new PlaylistRefresh("", 0, "");
         }
     }
 

@@ -289,6 +289,11 @@ public final class MainActivity extends Activity implements RemoteActions, Nativ
         if (nativeVideoPlayerView != null) {
             nativeVideoPlayerView.pauseOnBackground();
         }
+        // 切走那一刻把进度写回服务器：否则续播记录会停在最后一次保活（约 12 秒前）
+        if (activeTranscodeSession != null) {
+            playbackKeepAliveHandler.removeCallbacks(playbackKeepAliveRunnable);
+            playbackKeepAliveRunnable.run();
+        }
     }
 
     @Override
@@ -1351,10 +1356,9 @@ public final class MainActivity extends Activity implements RemoteActions, Nativ
             }
             return;
         }
-        nativeVideoPlayerView.hide();
-        openExternalPlayer(entry, url, "内置播放器无法播放"
-                + (reason == null || reason.length() == 0 ? "" : "（" + reason + "）")
-                + "，正在尝试外部播放器");
+        // 内置播放器失败不再自动切外部播放器（VLC）：留在播放页给提示，交给用户自己决定
+        nativeVideoPlayerView.showHintPublic("播放失败："
+                + (reason == null || reason.length() == 0 ? "播放器无法播放该片源" : reason));
     }
 
     @Override
@@ -1407,7 +1411,8 @@ public final class MainActivity extends Activity implements RemoteActions, Nativ
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        nativeVideoPlayerView.restartTranscoded(refresh.url, label, target, clamped);
+                        nativeVideoPlayerView.restartTranscoded(refresh.url, label, target, clamped,
+                                refresh.httpUrl);
                     }
                 });
             }
