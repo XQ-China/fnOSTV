@@ -179,7 +179,15 @@ public final class NativeSettingsView {
             address.setPadding(dp(14), 0, 0, dp(4));
             sidebar.addView(address);
         }
-        TextView version = muted("服务版本 " + summary.serviceVersion, 12);
+        // 左下角显示客户端自身的版本（跟 build.gradle 的 versionName 走，例如 1.0.5-v53）
+        String appVersion = "";
+        try {
+            appVersion = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Throwable ignored) {
+            appVersion = "";
+        }
+        TextView version = muted(appVersion.length() > 0 ? "版本 " + appVersion : "版本 未知", 12);
         version.setPadding(dp(14), 0, 0, 0);
         sidebar.addView(version);
     }
