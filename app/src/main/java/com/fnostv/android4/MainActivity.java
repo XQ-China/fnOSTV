@@ -2769,6 +2769,7 @@ public final class MainActivity extends Activity implements RemoteActions, Nativ
             }
             nativeVideoPlayerView.setPlaylist(playlist, entry.path,
                     profile == null ? "" : profile.baseUrl, posterAuthToken);
+            nativeVideoPlayerView.setHlsHttpUrl(transcode == null ? "" : transcode.httpUrl);
             nativeVideoPlayerView.play(entry, sources, startPositionMs,
                     transcode != null && transcode.url != null && transcode.url.length() > 0);
             return;

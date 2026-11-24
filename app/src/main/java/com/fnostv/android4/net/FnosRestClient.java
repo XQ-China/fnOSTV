@@ -684,6 +684,8 @@ public final class FnosRestClient {
         public final String videoGuid;
         public final String audioGuid;
         public final String playLink;
+        /** 可直接交给系统播放器（MediaPlayer）的 http m3u8 地址；空串表示服务器只认 Authorization 头，只能给 VLC 播。 */
+        public String httpUrl = "";
         public final String resolution;
         public final int bitrate;
         public final long durationSeconds;
@@ -1167,8 +1169,10 @@ public final class FnosRestClient {
             if (local.length() == 0) {
                 return null;
             }
-            return new TranscodeSession(local, itemGuid, mediaGuid, videoGuid, audioGuid,
+            TranscodeSession session = new TranscodeSession(local, itemGuid, mediaGuid, videoGuid, audioGuid,
                     playLink, TRANSCODE_RESOLUTION, bitrate, durationSeconds);
+            session.httpUrl = probeHttpPlaylist(playlistUrl);
+            return session;
         } catch (FnosRpcException ex) {
             Logger.w("Transcode play/play failed: " + ex.getMessage());
         } catch (JSONException ex) {
@@ -1218,6 +1222,35 @@ public final class FnosRestClient {
             Logger.w("Play/record payload failed: " + ex.getMessage());
         }
         return false;
+    }
+
+    /**
+     * 试探「把 token 放进 URL 参数」能不能直接拿到 m3u8：能拿到就说明系统播放器（MediaPlayer
+     * 无法加自定义 Header）也能自己拉列表、自己播 HLS，交给系统硬解；拿不到返回空串。
+     */
+    private String probeHttpPlaylist(String playlistUrl) {
+        if (playlistUrl == null || playlistUrl.length() == 0) {
+            return "";
+        }
+        String url = playlistUrl + (playlistUrl.indexOf('?') >= 0 ? "&" : "?")
+                + "authorization=" + encodeQueryValue(token);
+        Response response = null;
+        try {
+            Request request = new Request.Builder().url(url).build();
+            response = httpClientLong.newCall(request).execute();
+            if (!response.isSuccessful() || response.body() == null) {
+                return "";
+            }
+            String body = response.body().string();
+            return body != null && body.indexOf("#EXTM3U") >= 0 ? url : "";
+        } catch (Throwable ex) {
+            Logger.w("HLS http probe failed: " + ex.getMessage());
+            return "";
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
     }
 
     /** 带 token 拉取 m3u8 文本（HLS 播放列表与分片都只认 Authorization 头）。 */

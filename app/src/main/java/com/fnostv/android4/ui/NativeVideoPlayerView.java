@@ -109,6 +109,12 @@ public final class NativeVideoPlayerView {
     private static final long TEXTURE_KEEP_MS = 60000L;
     private FnosFileEntry currentEntry;
     private String currentUrl = "";
+    /** 转码 HLS 的 http m3u8 地址（token 在 URL 里），非空时把 HLS 交给系统播放器硬解。 */
+    private String hlsHttpUrl = "";
+
+    public void setHlsHttpUrl(String url) {
+        hlsHttpUrl = url == null ? "" : url;
+    }
     private PlayerEngine currentPlayer;
     private PlaybackOptions playbackOptions;
     private boolean surfaceReady;
@@ -1389,6 +1395,14 @@ public final class NativeVideoPlayerView {
         }
     }
 
+    /** 系统播放器播 HLS 时要用 http 列表；VLC 仍用本地改写过的 file:// 列表。 */
+    private String prepareUrlFor(PlayerEngine player) {
+        if (player instanceof SystemPlayerEngine && isTranscodeUrl(currentUrl) && hlsHttpUrl.length() > 0) {
+            return hlsHttpUrl;
+        }
+        return currentUrl;
+    }
+
     private void startPlayer() {
         if (currentUrl.length() == 0 || !surfaceReady) {
             return;
@@ -1505,6 +1519,13 @@ public final class NativeVideoPlayerView {
                     if (suppressErrors || currentUrl.length() == 0) {
                         return;
                     }
+                    // 系统播放器播不了 HLS（老机型限制）：本次播放一路回 VLC
+                    if (player instanceof SystemPlayerEngine && (isTranscodeUrl(currentUrl)
+                            || currentUrl.indexOf(".m3u8") >= 0)) {
+                        forceVlc = true;
+                        restartPlayback("系统播放器播不了 HLS，改回 VLC");
+                        return;
+                    }
                     notifyPlaybackError(reason);
                 }
 
@@ -1533,7 +1554,7 @@ public final class NativeVideoPlayerView {
             updateControlText();
             guardSystemFirstFrame(player);
             try {
-                player.prepare(currentUrl, playbackOptions);
+                player.prepare(prepareUrlFor(player), playbackOptions);
             } catch (Throwable ex) {
                 throw ex;
             }
@@ -1563,10 +1584,6 @@ public final class NativeVideoPlayerView {
     }
 
     private boolean shouldUseSystemPlayer() {
-        // 实验版：一律走 VLC（能带 MediaCodec 硬解 + 倍速）
-        if (EXPERIMENT_VLC_ONLY) {
-            return false;
-        }
         // safeMode：刚重启过（怀疑直连把电视拖崩），本次运行一律用 VLC
         if (safeMode || forceVlc || !hardwareDecoderAllowed()
                 || currentEntry == null || currentUrl.length() == 0) {
@@ -1579,6 +1596,11 @@ public final class NativeVideoPlayerView {
         if (currentEntry.isLive()) {
             // 直播统一走 VLC：m3u8 / rtsp / udp 组播都由 libVLC 处理
             return false;
+        }
+        // 服务器转码的 HLS：列表能带 token 直接 http 拉（hlsHttpUrl 非空）时，
+        // 交给系统播放器原生 HLS 硬解；只能走本地 file:// 改写列表时仍给 VLC。
+        if (isTranscodeUrl(currentUrl)) {
+            return hlsHttpUrl.length() > 0;
         }
         String url = currentUrl.toLowerCase(Locale.US);
         if (url.startsWith("file://") || url.indexOf(".m3u8") >= 0) {
