@@ -52,11 +52,11 @@
 
 ## 下载
 
-- **[`fnOSTV-1.0.5-TextureView.apk`](https://github.com/xq-china/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk)** — 成品包，覆盖安装即可（保留登录态）
-- **[`源代码 (zip)`](https://github.com/xq-china/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip)** — 解压可直接继续开发
-- **[`源代码 (tar.gz)`](https://github.com/xq-china/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.tar.gz)** — 与 zip 内容相同，二选一
+- **[`fnOSTV-1.0.5-TextureView.apk`](https://github.com/XQ-China/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk)** — 成品包，覆盖安装即可（保留登录态）
+- **[`源代码 (zip)`](https://github.com/XQ-China/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip)** — 解压可直接继续开发
+- **[`源代码 (tar.gz)`](https://github.com/XQ-China/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.tar.gz)** — 与 zip 内容相同，二选一
 
-也可以直接进 [发行版页面](https://github.com/xq-china/fnOSTV/releases/latest) 下载。
+也可以直接进 [发行版页面](https://github.com/XQ-China/fnOSTV/releases/latest) 下载。
 
 文件命名规则：产物文件名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
 
@@ -131,8 +131,8 @@ keytool -genkeypair -keystore signing/debug.keystore -storepass android \
 | [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | 电视端使用说明：安装、登录、遥控器按键、常见问题 |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | 开发说明：架构、目录、关键流程、扩展方式、构建与调试 |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | 近期重构与行为变更记录 |
-| [`fnOSTV-1.0.5-TextureView-src.zip`](https://github.com/xq-china/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip) | 源码压缩包（可直接解压继续开发） |
-| [`fnOSTV-1.0.5-TextureView.apk`](https://github.com/xq-china/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk) | 成品 APK |
+| [`fnOSTV-1.0.5-TextureView-src.zip`](https://github.com/XQ-China/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip) | 源码压缩包（可直接解压继续开发） |
+| [`fnOSTV-1.0.5-TextureView.apk`](https://github.com/XQ-China/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk) | 成品 APK |
 | [docs/fnos-interface-map.md](docs/fnos-interface-map.md) | fnOS 接口梳理（历史资料） |
 | [RELEASE_NOTES.md](RELEASE_NOTES.md) | 当前版本能力与已知限制 |
 | [OPEN_SOURCE.md](OPEN_SOURCE.md) / [NOTICE](NOTICE) | 开源使用与第三方组件声明 |
