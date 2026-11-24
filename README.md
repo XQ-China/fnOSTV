@@ -110,8 +110,8 @@ Windows 下 `scripts/` 里有等价的 .cmd / .ps1 脚本，按需选用。
 | [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | 电视端使用说明：安装、登录、遥控器按键、常见问题 |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | 开发说明：架构、目录、关键流程、扩展方式、构建与调试 |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | 近期重构与行为变更记录 |
-| `fnOSTV-1.0.5-TextureView-src.zip` | 源码压缩包（可直接解压继续开发） |
-| `fnOSTV-1.0.5-TextureView.apk` | 成品 APK |
+| [`fnOSTV-1.0.5-TextureView-src.zip`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip) | 源码压缩包（可直接解压继续开发） |
+| [`fnOSTV-1.0.5-TextureView.apk`](https://github.com/xiao0qi/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk) | 成品 APK |
 | [docs/fnos-interface-map.md](docs/fnos-interface-map.md) | fnOS 接口梳理（历史资料） |
 | [RELEASE_NOTES.md](RELEASE_NOTES.md) | 当前版本能力与已知限制 |
 | [OPEN_SOURCE.md](OPEN_SOURCE.md) / [NOTICE](NOTICE) | 开源使用与第三方组件声明 |
