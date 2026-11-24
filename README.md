@@ -12,7 +12,7 @@
 - 版本：`1.0.5`（个人修改版 · TextureView 播放层 · versionCode 35）
 - 最低系统：**Android 4.2 / API 17**（重点适配 Android 4.4 电视）
 - 编译/目标：API 28
-- 体积：release APK ≈ 16MB（只打包 `armeabi-v7a`，主要体积是 `libvlc.so`）
+- 体积：release APK ≈ 17MB（17,844,918 B；只打包 `armeabi-v7a`，主要体积是 `libvlc.so`）
 - 协议：MIT
 
 ---

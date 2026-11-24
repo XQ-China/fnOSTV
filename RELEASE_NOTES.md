@@ -9,7 +9,7 @@
 - 最低系统：Android 4.2 / API 17（重点适配 Android 4.4 电视）
 - 编译与目标：API 28
 - 主线：原生轻量客户端（无 WebView / Kotlin / Compose / AndroidX）
-- 成品：`docs/fnOSTV-1.0.5.apk`（release 签名，约 16MB，仅 armeabi-v7a）
+- 成品：`fnOSTV-1.0.5-TextureView.apk`（release 签名，约 17MB / 17,844,918 B，仅 armeabi-v7a）
 
 ## 已实现功能
 
