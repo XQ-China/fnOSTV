@@ -41,7 +41,7 @@
 - 分类：全部 / 电影 / 电视节目 / 电视直播 / 其他、收藏、搜索
 - 详情页：海报、评分、年份、简介、剧集/版本、播放源切换、收藏
 - 播放：原画直连走电视硬解（4K HEVC/H.264），转码流与特殊容器走 LibVLC；失败自动回退，自动重试
-- 播放器：播放类型按钮（硬解/软解/转码）、播放信息面板（长按确认或工具栏进入）、横向选集面板
+- 播放器：播放类型按钮（硬解/软解/转码）、播放信息面板（长按确认或工具栏进入）、右侧竖排选集面板（按「下」呼出）
 - 选集缩略图：可视区域即时加载，滑动实时补图，缺失剧照自动兜底
 - 电视直播：支持 IPTV 播单（m3u / txt，http(s) 或本地文件），左栏固定分类（央视频道/卫视频道/电影频道/数字频道/儿童频道/地方频道/综艺频道/纪录频道）、右栏频道列表（带台标），背后直接播放；选台/掉线自动重连
 - 稳定性：电视刚重启过会自动进入「安全模式」（改用 VLC 解码），避免同一片源反复把电视拖崩
@@ -74,10 +74,14 @@ adb logcat | grep -i fnostv
 
 出签名包：
 
+先按下面「签名文件说明」准备好证书与 `keystore.properties`，再：
+
 ```bash
-keytool -genkeypair -keystore signing/release.jks -alias fnostv -keyalg RSA -keysize 2048 -validity 3650
 gradle assembleRelease --no-daemon
+# 产物：app/build/outputs/apk/release/app-release.apk
 ```
+
+没有 `keystore.properties` 时 `assembleRelease` 只会产出 `app-release-unsigned.apk`，这个包不能被设备安装。
 
 Windows 下 `scripts/` 里有等价的 .cmd / .ps1 脚本，按需选用。
 
@@ -89,7 +93,7 @@ Windows 下 `scripts/` 里有等价的 .cmd / .ps1 脚本，按需选用。
 
 也可以直接进 [发行版页面](https://github.com/xiao0qi/fnOSTV/releases/latest) 下载。
 
-文件名规则：包名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
+文件命名规则：产物文件名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
 
 ### 签名文件说明
 

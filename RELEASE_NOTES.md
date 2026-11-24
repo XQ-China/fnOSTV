@@ -2,10 +2,10 @@
 
 > 本项目基于 [XG-China/fnOSTV](https://github.com/XG-China/fnOSTV) 二次开发（MIT），其又基于 [XDORG-N1/fnOSTV](https://github.com/XDORG-N1/fnOSTV)，原始版权归 XDORG-N1 所有。
 
-## 当前版本：1.0.5（versionCode 7）
+## 当前版本：1.0.5（versionCode 35）
 
 - 包名：`com.fnostv.android4`
-- 版本号：`1.0.5` / versionCode `7`
+- 版本号：`1.0.5` / versionCode `35`
 - 最低系统：Android 4.2 / API 17（重点适配 Android 4.4 电视）
 - 编译与目标：API 28
 - 主线：原生轻量客户端（无 WebView / Kotlin / Compose / AndroidX）
@@ -23,7 +23,7 @@
   - 自动回退：系统播放器失败 → VLC；无首帧兜底；倍速自动切 VLC
   - 播放类型按钮（`硬解 · 系统` / `硬解 · VLC` / `软解 · VLC` / `转码 · HLS`）
   - 播放信息面板（中文：播放类型、解码方式、片源、分辨率、格式/通道、进度、状态、缓冲）
-  - 横向选集面板（按「下」呼出，缩略图可视即加载、滑动补图、当前集高亮）
+  - 右侧竖排选集面板（按「下」呼出，缩略图可视即加载、滑动补图、当前集蓝框高亮）
   - 自动连播、片尾处理、已看完从头播、拖拽进度、转码拖动重建会话
 - 电视直播（IPTV）：
   - 设置里填 m3u / txt 播单地址（http(s) 或本地文件）
@@ -59,7 +59,7 @@ scripts\setup-android-env.ps1     # 首次：准备本地 SDK/JDK/Gradle
 scripts\build-debug.ps1           # debug APK
 scripts\build-release.ps1         # 已签名 release APK
 scripts\install-debug.ps1         # adb 安装（需先 adb connect）
-scripts\package-source.ps1        # 打包源码（含签名）
+scripts\package-source.ps1        # 打包源码（不含签名，签名文件已被 .gitignore 排除）
 ```
 
 ## 已知限制
