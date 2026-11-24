@@ -187,7 +187,13 @@ public final class NativeSettingsView {
         } catch (Throwable ignored) {
             appVersion = "";
         }
-        TextView version = muted(appVersion.length() > 0 ? "版本 " + appVersion : "版本 未知", 12);
+        // 只显示版本标签：1.0.5-v53 → v53，以后每出一版自动跟着变
+        String versionLabel = appVersion;
+        int dash = versionLabel.lastIndexOf('-');
+        if (dash >= 0 && dash + 1 < versionLabel.length()) {
+            versionLabel = versionLabel.substring(dash + 1);
+        }
+        TextView version = muted(versionLabel.length() > 0 ? versionLabel : "未知版本", 12);
         version.setPadding(dp(14), 0, 0, 0);
         sidebar.addView(version);
     }

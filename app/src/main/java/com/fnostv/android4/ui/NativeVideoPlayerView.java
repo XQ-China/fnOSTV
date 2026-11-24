@@ -463,9 +463,7 @@ public final class NativeVideoPlayerView {
     private final Runnable prepareTimeoutRunnable = new Runnable() {
         @Override
         public void run() {
-            if (isVisible() && !prepared && !suppressErrors) {
-                notifyPlaybackError("播放器准备超时");
-            }
+            // 已关闭：不再按秒数判定超时（慢流/老机器起播慢时会被误杀）
         }
     };
     /** 播够 90 秒没出事，就把「最后播放」标记清掉（避免下次误判）。 */
@@ -1624,6 +1622,10 @@ public final class NativeVideoPlayerView {
      * 注意不能太激进——视频层还占着时立刻起第二个解码器，MTK 电视可能会整机重启。
      */
     private void guardSystemFirstFrame(final PlayerEngine engine) {
+        // 已关闭：不再按秒数自动切回 VLC，只在真正解码报错时回退
+        if (true) {
+            return;
+        }
         if (!(engine instanceof SystemPlayerEngine)) {
             return;
         }
