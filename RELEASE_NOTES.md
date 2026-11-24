@@ -1,6 +1,6 @@
 # 发布版本信息
 
-> 本项目基于 [XDORG-N1/fnOSTV](https://github.com/XDORG-N1/fnOSTV) 二次开发（MIT），原项目版权归 XDORG-N1 所有。
+> 本项目基于 [XG-China/fnOSTV](https://github.com/XG-China/fnOSTV) 二次开发（MIT），其又基于 [XDORG-N1/fnOSTV](https://github.com/XDORG-N1/fnOSTV)，原始版权归 XDORG-N1 所有。
 
 ## 当前版本：1.0.5（versionCode 7）
 
