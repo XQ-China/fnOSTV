@@ -83,9 +83,11 @@ Windows 下 `scripts/` 里有等价的 .cmd / .ps1 脚本，按需选用。
 
 ### 下载
 
-- **`fnOSTV-1.0.5-TextureView.apk`** — 成品包，覆盖安装即可（保留登录态）
-- **`源代码 (zip)`** — 解压可直接继续开发
-- **`源代码 (tar.gz)`** — 与 zip 内容相同，二选一
+- **[`fnOSTV-1.0.5-TextureView.apk`](https://github.com/xiao0qi/fnOSTV/releases/download/fnOSTV-1.0.5-TextureView-v52/fnOSTV-1.0.5-TextureView.apk)** — 成品包，覆盖安装即可（保留登录态）
+- **[`源代码 (zip)`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.zip)** — 解压可直接继续开发
+- **[`源代码 (tar.gz)`](https://github.com/xiao0qi/fnOSTV/archive/refs/tags/fnOSTV-1.0.5-TextureView-v52.tar.gz)** — 与 zip 内容相同，二选一
+
+也可以直接进 [发行版页面](https://github.com/xiao0qi/fnOSTV/releases/latest) 下载。
 
 文件名规则：包名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
 
