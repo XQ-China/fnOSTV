@@ -193,7 +193,7 @@ public final class NativeSettingsView {
         if (dash >= 0 && dash + 1 < versionLabel.length()) {
             versionLabel = versionLabel.substring(dash + 1);
         }
-        TextView version = muted(versionLabel.length() > 0 ? versionLabel : "未知版本", 12);
+        TextView version = muted("服务版本 " + (versionLabel.length() > 0 ? versionLabel : "未知"), 12);
         version.setPadding(dp(14), 0, 0, 0);
         sidebar.addView(version);
     }
