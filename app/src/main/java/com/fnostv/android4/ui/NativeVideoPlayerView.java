@@ -416,7 +416,6 @@ public final class NativeVideoPlayerView {
     /** 卡帧检测：播放位置长时间不动就重新起播一次。 */
     private int lastProgressPosition = -1;
     private long lastProgressAtMs;
-    private boolean stuckRestarted;
     /** 重建播放器后要跳到的位置；-1 表示不需要。 */
     private int restartSeekTargetMs = -1;
     /** 重建/跳转进行中，用于合并连续按键。 */
@@ -1006,7 +1005,6 @@ public final class NativeVideoPlayerView {
         liveRetries = 0;
         lastProgressPosition = -1;
         lastProgressAtMs = 0L;
-        stuckRestarted = false;
         // 记录最后播放的条目：电视如果意外重启，下次启动时用它判断要不要进安全模式
         com.fnostv.android4.util.AppPrefs.putString(context,
                 com.fnostv.android4.util.AppPrefs.KEY_LAST_PLAY_NAME,
@@ -1506,13 +1504,6 @@ public final class NativeVideoPlayerView {
                     if (suppressErrors || currentUrl.length() == 0) {
                         return;
                     }
-                    // 系统播放器播不了 HLS（老机型限制）：本次播放一路回 VLC
-                    if (player instanceof SystemPlayerEngine && (isTranscodeUrl(currentUrl)
-                            || currentUrl.indexOf(".m3u8") >= 0)) {
-                        forceVlc = true;
-                        restartPlayback("系统播放器播不了 HLS，改回 VLC");
-                        return;
-                    }
                     notifyPlaybackError(reason);
                 }
 
@@ -1667,12 +1658,6 @@ public final class NativeVideoPlayerView {
                 + " source=" + currentSource().label
                 + " reason=" + reason);
         if (!retriedPlayback) {
-            if (currentPlayer instanceof SystemPlayerEngine) {
-                // 系统播放器打不开这个片源：本片改用 VLC（保留硬解尝试）
-                forceVlc = true;
-                restartPlayback("系统解码失败，改用 VLC");
-                return;
-            }
             // 首次失败：切软解再试一次（硬解在部分老机型上会失败），仍失败才回调错误。
             retryWithSoftwareCodec("播放失败，正在重试");
             return;
@@ -2794,38 +2779,11 @@ public final class NativeVideoPlayerView {
         }
         int duration = duration();
         int position = position();
-        checkStuck(position);
         if (duration > 0) {
             seekBar.setProgress(toSeekBarProgress(position, duration));
         }
         updateTimeLabel(position, duration);
         updateControlText();
-    }
-
-    /** 播放中位置 8 秒不动 = 卡帧：换 VLC 重起一次（只做一次，避免反复）。 */
-    private void checkStuck(int position) {
-        if (!prepared || currentPlayer == null || !currentPlayer.isPlaying()) {
-            lastProgressAtMs = 0L;
-            return;
-        }
-        long now = System.currentTimeMillis();
-        if (position != lastProgressPosition) {
-            lastProgressPosition = position;
-            lastProgressAtMs = now;
-            return;
-        }
-        if (lastProgressAtMs == 0L) {
-            lastProgressAtMs = now;
-            return;
-        }
-        if (now - lastProgressAtMs < 8000L || stuckRestarted) {
-            return;
-        }
-        stuckRestarted = true;
-        lastProgressAtMs = now;
-        forceVlc = true;
-        Logger.w("Playback stuck at " + position + "ms, restart with VLC");
-        restartPlayback("画面卡住，正在重新起播");
     }
 
     private void updateTimeLabel(int position, int duration) {
