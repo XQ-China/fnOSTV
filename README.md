@@ -91,8 +91,23 @@ Windows 下 `scripts/` 里有等价的 .cmd / .ps1 脚本，按需选用。
 
 文件名规则：包名只写播放层（`TextureView` / `SurfaceView`），版本号只写在标签上，例如 `fnOSTV-1.0.5-TextureView-v52`。
 
-> 包里**包含** `signing/`（debug/release keystore）、`keystore.properties`、`local.properties`，
-> 解压即可直接出签名包；请勿把该压缩包公开分发。
+### 签名文件说明
+
+源码包里**不含**签名相关文件——`signing/`、`keystore.properties`、`local.properties` 都在 `.gitignore` 里，不会被打包。所以解压后不能直接出签名包，需要自己补上：
+
+1. **release 证书**：跑 `scripts\create-release-keystore.cmd`（Windows）或对应 `.ps1`，会在 `signing/` 下生成 `fnostv-release.jks` 并自动写好 `keystore.properties`
+2. **`keystore.properties`** 需有四项：`storeFile`、`storePassword`、`keyAlias`、`keyPassword`——`app/build.gradle` 读的就是这四个键
+3. **出包**：`gradle assembleRelease --no-daemon`，产物在 `app/build/outputs/apk/release/`
+
+debug 包读的是 `signing/debug.keystore`（口令 `android`，别名 `androiddebugkey`），这个文件同样不在源码包里。只是想本地编译调试的话，随便生成一个即可：
+
+```bash
+keytool -genkeypair -keystore signing/debug.keystore -storepass android \
+  -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 3650 \
+  -dname "CN=Android Debug,O=Android,C=US"
+```
+
+注意 debug 和 release 签名不同：**已装 release 版想覆盖升级，必须用同一份 release 证书**，否则要先卸载。
 
 ### 本版新增内容（相对 XG-China/fnOSTV）
 
